@@ -1,4 +1,4 @@
-import cv2 as cv
+import cv2
 import numpy as np
 
 class ColorAnalysis:
@@ -10,10 +10,9 @@ class ColorAnalysis:
         Z = np.float32(Z)
 
         # define criteria, number of clusters(K) and apply kmeans()
-        criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 10, 1.0)
-
+        criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 50, 1.0)
         
-        ret,label,center=cv.kmeans(Z,K,None,criteria,10,cv.KMEANS_RANDOM_CENTERS)
+        ret,label,center=cv2.kmeans(Z,K,None,criteria,10,cv2.KMEANS_PP_CENTERS)
         #print(ret)
         #print(label)
         #print(center)
@@ -24,6 +23,7 @@ class ColorAnalysis:
         res2 = res.reshape((image.shape))
         
         return res2,ret,label,center
+        
 
 
     def MuitiKmeans(imageList,K):
@@ -54,3 +54,6 @@ class ColorAnalysis:
         
         #resultImageList:分析后的图像列表 testImages：分析后的所有图片合成的单张图片，用于分析颜色种类和频率
         return (resultImageList,resultImages)
+
+
+    

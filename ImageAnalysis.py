@@ -10,28 +10,17 @@ class ImageAnalysis:
     
     # rgb 表达方式转化
     def ColorDistribution2(image):
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        modified_img = image.reshape(image.shape[0]*image.shape[1], 3)
-        hexcolorlist=[]
-        for i in range(len(modified_img)):
-            hexcolorlist.append(ImageAnalysis.rgb_to_hex(modified_img[i]))
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            modified_img = image.reshape(image.shape[0]*image.shape[1], 3)
+            hexcolorlist=[]
+            for i in range(len(modified_img)):
+                #去掉黑色
+                if (ImageAnalysis.rgb_to_hex(modified_img[i]) != "#000000"):
+                    hexcolorlist.append(ImageAnalysis.rgb_to_hex(modified_img[i]))
 
-        unique,counts=np.unique(hexcolorlist,return_counts=True)
-        '''
-        rgbcolorlist=[]
-        for hexcolor in hexcolorlist:
-            rgbcolorlist.append(ImageAnalysis.hex_to_rgb(hexcolor))
-        '''
-        #plt.figure(figsize = (12, 8))
-        #plt.pie(counts, colors = hexcolorlist)
-        #plt.bar(unique,counts,color = unique)
-        #plt.savefig()
-        #plt.show()
-        #print(hexcolorlist)
+            unique,counts=np.unique(hexcolorlist,return_counts=True)
 
-        #print(unique)
-        #print(counts)
-        return (unique,counts)
+            return (unique,counts)
         
 
 

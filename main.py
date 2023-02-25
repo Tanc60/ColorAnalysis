@@ -207,6 +207,105 @@ def SegmentationAnalysis(sourceDir,targetDir,labels):
         MaskedImgs.append(monoMaskedImg)
 
 
+def ModifiedKmeansAnaylsis(SourceDir, targetDir, K, scale):
+    os.chdir(SourceDir)
+    print(os.getcwd())
+    filenames = os.listdir()
+    for filename in filenames:
+        ModifiedKmeans(filename, targetDir, K, scale)
+
+
+#-------------------------------------------------Multi-Iteration Method----------------------------------------------
+def ModifiedKmeans(filename, targetDir, KList, scale):
+    image = ImageIO.GetImageFromFileCV(filename)
+    image = ImageIO.ResizeImgCV(image,(300,200))
+
+
+    #1st kmeans
+    #PltImg(image[:,:,::-1])
+
+    #reshape 
+   
+    inputImg = image.reshape(-1,3)
+   
+    for i in KList:
+
+
+        #kmeans
+        (resultImg,_,labels,centers)=ColorAnalysis.KmeansSeg(inputImg,i)
+        #resultImg------>inputImg colormap
+        '''
+        colormap=[]
+        temp=[]
+        originImg = image.reshape(-1,3)
+        for i in range(len(labels)):
+
+            colormap.append((centers[labels[i]],inputImg[i]))
+            
+        #colormap=np.unique(colormap)
+        '''
+
+        #-------------------process the mod_res-----------------------
+        mod_res=resultImg.copy()
+        #unique
+        (mod_res,indices,imgcounts)=np.unique(mod_res,axis=0,return_counts=True,return_index=True)
+        #preseve order
+        #mod_res=mod_res[np.argsort(indices)]
+
+        #process the imgcounts, reduce the difference by the scale factor
+
+        mod_counts=Smoothlist(imgcounts,scale)
+        #repeat imgcounts
+        mod_res=np.repeat(mod_res,mod_counts,axis=0)
+        difference=image.shape[0]*image.shape[1]-mod_res.shape[0]*mod_res.shape[1]
+        if difference > 0:
+            mod_res=np.pad(mod_res,((0,difference),(0,0)),"wrap")
+
+        #------------rebuid image--------------
+
+        
+
+        #PltImg(real_res)
+
+        print("------------------"+ str(i) +"------------------------")
+        print("------------------"+ filename +"------------------------")
+
+        #reset the input value
+        inputImg=mod_res
+
+
+
+    #result=result.reshape(1,-1,3)
+
+    """
+    plt.figure(figsize = (6, 4))
+    a=np.array([10]*result.shape[0])
+    plt.bar(result,a,color = result)
+    """
+
+    #PltImg(image)
+
+    #plot graph
+    (unique,counts)=ImageAnalysis.ColorDistribution2(mod_res.reshape(1,-1,3))
+
+    filenamewithoutextension=filename.split(".")[0] #删去扩展名
+
+    plt.figure(figsize = (12, 8))
+    plt.bar(unique,counts,color = unique)
+    plt.savefig(targetDir+"/"+filenamewithoutextension+".png")
+    plt.close()
+
+
+def Smoothlist(inputList,scale):
+    workingList = inputList.copy()
+    avg=np.average(workingList)
+    for i in range(len(workingList)):
+        workingList[i]=avg+scale*(workingList[i]-avg)
+    return workingList
+
+
+
+
 
 
 if __name__ =="__main__":
