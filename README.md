@@ -42,5 +42,5 @@ scale = 1 时，相当于保留所有重复值。
 5. 注意：调整后的方法只表示颜色种类，不能反映颜色的真实占比。
 
 Detail information please see:
-https://github.com/Tanc60/ColorAnalysis/blob/main/KmeansIterationMethod/kmeans_iteration.ipynb
+[https://github.com/Tanc60/ColorAnalysis/blob/main/KmeansIterationMethod/kmeans_iteration.ipynb](https://github.com/Tanc60/ColorAnalysis/blob/main/Note/kmeans_iteration.ipynb)
 
