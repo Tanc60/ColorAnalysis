@@ -7,25 +7,15 @@ import main
 root = tk.Tk()
 root.title('Color Analysis ToolKit')
 
+root.option_add( "*font", "Consolas 12" )
 
 
-window_width = 1000
-window_height = 600
-
-# get the screen dimension
-screen_width = root.winfo_screenwidth()
-screen_height = root.winfo_screenheight()
-
-# find the center point
-center_x = int(screen_width/2 - window_width / 2)
-center_y = int(screen_height/2 - window_height / 2)
-
-# set the position of the window to the center of the screen
-root.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
 
 #font config
 Title_Font=("Consolas",16)
-Text_Font=("Consolas",12)
+
+s = ttk.Style()
+s.configure('.', font=('Consolas', 12))
 
 
 # configure the grid
@@ -35,7 +25,7 @@ root.columnconfigure(1, weight=3)
 title_label=ttk.Label(root, text='Image Analysis',font=Title_Font)
 title_label.grid(column=0, row=0, sticky=tk.W, padx=5, pady=5)
 
-inputDir_label=ttk.Label(root, text='Input Directory:',font=Text_Font)
+inputDir_label=ttk.Label(root, text='Input Directory:')
 inputDir_label.grid(column=0, row=1, sticky=tk.W, padx=5, pady=5)
 
 inputDir = tk.StringVar()
@@ -43,7 +33,7 @@ inputDir_entry = ttk.Entry(root,width=100,textvariable=inputDir)
 inputDir_entry.grid(column=1, row=1, sticky=tk.E, padx=5, pady=5)
 
 
-outputDir_label=ttk.Label(root, text='Output Directory:',font=Text_Font)
+outputDir_label=ttk.Label(root, text='Output Directory:')
 outputDir_label.grid(column=0, row=2, sticky=tk.W, padx=5, pady=5)
 
 outputDir = tk.StringVar()
@@ -53,7 +43,7 @@ outputDir_entry.grid(column=1, row=2, sticky=tk.E, padx=5, pady=5)
 
 
 #label
-lab_label=ttk.Label(root, text='Label(s)(example:0 1 2):',font=Text_Font)
+lab_label=ttk.Label(root, text='Label(s)(example:0 1 2):')
 lab_label.grid(column=0, row=3, sticky=tk.W, padx=5, pady=5)
 
 lab_Var = tk.StringVar()
@@ -85,7 +75,7 @@ seg_button.grid(column=1, row=4, sticky=tk.E, padx=5, pady=5)
 seg_button.configure(command=seg_button_clicked)
 
 # K
-K_label=ttk.Label(root, text='K (K>0, k∈integer):',font=Text_Font)
+K_label=ttk.Label(root, text='K (K>0, k∈integer):')
 K_label.grid(column=0, row=5, sticky=tk.W, padx=5, pady=5)
 
 K_Var = tk.StringVar()
@@ -94,7 +84,7 @@ K_entry = ttk.Entry(root,width=100,textvariable=K_Var)
 K_entry.grid(column=1, row=5, sticky=tk.E, padx=5, pady=5)
 
 # K-List
-KList_label=ttk.Label(root, text='KList(example:200 15):',font=Text_Font)
+KList_label=ttk.Label(root, text='KList(example:200 15):')
 KList_label.grid(column=0, row=6, sticky=tk.W, padx=5, pady=5)
 
 KList_Var = tk.StringVar()
@@ -103,7 +93,7 @@ KList_entry = ttk.Entry(root,width=100,textvariable=KList_Var)
 KList_entry.grid(column=1, row=6, sticky=tk.E, padx=5, pady=5)
 
 # Scale
-scale_label=ttk.Label(root, text='Scale (0 < Scale < 1):',font=Text_Font)
+scale_label=ttk.Label(root, text='Scale (0 < Scale < 1):')
 scale_label.grid(column=0, row=7, sticky=tk.W, padx=5, pady=5)
 
 scale_Var = tk.StringVar()
