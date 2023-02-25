@@ -21,8 +21,7 @@ color analysis tool, segmentation, kmeans and statistic analysis
 
 聚类结果受颜色在图像中的占比影响
 当K取值较小时，聚类结果容易忽略色彩对比鲜明，但占比较少的颜色
-![image.png](attachment:image.png)——>![image.png](attachment:image.png)
-![image.png](attachment:image-2.png)
+
 
 --------------- modified kmeans method ------------------
 
@@ -39,26 +38,3 @@ scale = 1 时，相当于保留所有重复值。
 4. Klist控制聚类的迭代次数和k值
 例如klist = 200 100 10，表示依次按200,100,10的顺序进行迭代。
 
-scale = 1
-
-![image.png](attachment:image-3.png)
-
-scale = 0.8
-
-![image.png](attachment:image-4.png)
-
-scale = 0.6
-
-![image.png](attachment:image-5.png)
-
-scale = 0.4
-
-![image.png](attachment:image-6.png)
-
-scale = 0.2
-
-![image.png](attachment:image-7.png)
-
-scale = 0
-
-![image.png](attachment:image-8.png)
