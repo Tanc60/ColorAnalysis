@@ -39,7 +39,6 @@ scale = 1 时，相当于保留所有重复值。
 4. Klist控制聚类的迭代次数和k值
 例如klist = 200 100 10，表示依次按200,100,10的顺序进行迭代。
 
-5. 注意：调整后的方法只表示颜色种类，不能反映颜色的真实占比。
 
 Detail information please see:
 [https://github.com/Tanc60/ColorAnalysis/blob/main/KmeansIterationMethod/kmeans_iteration.ipynb](https://github.com/Tanc60/ColorAnalysis/blob/main/Note/kmeans_iteration.ipynb)
