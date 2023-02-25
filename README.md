@@ -17,7 +17,7 @@ color analysis tool, segmentation, kmeans and statistic analysis
 
 
 
---------------- kmeans method-----------------------
+--------------- kmeans method -----------------------
 
 聚类结果受颜色在图像中的占比影响
 当K取值较小时，聚类结果容易忽略色彩对比鲜明，但占比较少的颜色
@@ -26,6 +26,7 @@ color analysis tool, segmentation, kmeans and statistic analysis
 --------------- modified kmeans method ------------------
 
 改进算法采用多层聚类方法
+
 1. 首先采用较大K值（例如k=200）进行初步聚类分析，过滤掉图像中的噪声
 
 2. 删掉聚类结果中的重复值，这样就可以消除颜色占比对聚类结果的影响
@@ -38,6 +39,7 @@ scale = 1 时，相当于保留所有重复值。
 4. Klist控制聚类的迭代次数和k值
 例如klist = 200 100 10，表示依次按200,100,10的顺序进行迭代。
 
+5. 注意：调整后的方法只表示颜色种类，不能反映颜色的真实占比。
 
 Detail information please see:
 https://github.com/Tanc60/ColorAnalysis/blob/main/KmeansIterationMethod/kmeans_iteration.ipynb
