@@ -3,16 +3,21 @@ import numpy as np
 
 class ColorAnalysis:
     def KmeansSeg(image,K):
-        
-        Z = image.reshape((-1,3))
+    
+        data = image.reshape((-1,3))
+
+        #convert black to white
+        for i in range(len(data)):
+            if data[i].tolist()==[0,0,0]:
+                data[i]=[512,512,512]
 
         # convert to np.float32
-        Z = np.float32(Z)
+        data = np.float32(data)
 
         # define criteria, number of clusters(K) and apply kmeans()
         criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 50, 1.0)
         
-        ret,label,center=cv2.kmeans(Z,K,None,criteria,10,cv2.KMEANS_PP_CENTERS)
+        ret,label,center=cv2.kmeans(data,K,None,criteria,10,cv2.KMEANS_PP_CENTERS)
         #print(ret)
         #print(label)
         #print(center)

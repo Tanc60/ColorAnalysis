@@ -216,34 +216,69 @@ def ModifiedKmeansAnaylsis(SourceDir, targetDir, K, scale):
 
 
 #-------------------------------------------------Multi-Iteration Method----------------------------------------------
-def ModifiedKmeans(filename, targetDir, KList, scale):
+def ModifiedKmeans(filename, targetDir, Klist, scale):
     image = ImageIO.GetImageFromFileCV(filename)
     image = ImageIO.ResizeImgCV(image,(300,200))
 
-
+    
     #1st kmeans
     #PltImg(image[:,:,::-1])
 
     #reshape 
    
+
     inputImg = image.reshape(-1,3)
-   
-    for i in KList:
+    hex_originImg=[]
+    originImg = image.reshape(-1,3)
+    for color in originImg:
+        inputColor=ImageAnalysis.rgb_to_hex(color.flatten())
+        hex_originImg.append(inputColor)
 
+    #hex_originImg=np.array(hex_originImg,dtype="U7")
 
+    count=0
+    
+    for k in Klist:
+        
         #kmeans
-        (resultImg,_,labels,centers)=ColorAnalysis.KmeansSeg(inputImg,i)
-        #resultImg------>inputImg colormap
-        '''
-        colormap=[]
-        temp=[]
-        originImg = image.reshape(-1,3)
-        for i in range(len(labels)):
+        (resultImg,_,labels,centers)=ColorAnalysis.KmeansSeg(inputImg,k)
 
-            colormap.append((centers[labels[i]],inputImg[i]))
-            
-        #colormap=np.unique(colormap)
-        '''
+        #resultImg------>inputImg colorpair
+
+        #simplify colorpair
+        colorpair=[]
+        for i in range(len(labels)):
+            inputColor=ImageAnalysis.rgb_to_hex(inputImg[i].flatten())
+            outputColor=ImageAnalysis.rgb_to_hex(centers[labels[i]].flatten())
+            colorpair.append([inputColor,outputColor])
+
+        
+        if count == 0:
+            for a in range(len(hex_originImg)):
+                hex_originImg[a]=colorpair[a][1]
+                
+            colorpair=np.array(colorpair)
+            colorpair=np.unique(colorpair,axis=0)
+            colorpair.tolist()    
+        else:
+            #simplify hex_originImg
+            hex_originImg,index,inverse,counts=np.unique(hex_originImg,return_index=True,return_inverse=True,return_counts=True,axis=0)
+            for idx in range(len(hex_originImg)):
+                for color in colorpair:
+                    if hex_originImg[idx]==color[0]:
+                        hex_originImg[idx]=color[1]
+                        break
+            #rebuild hex_originImg
+            hex_originImg=hex_originImg[inverse]
+        count = count + 1
+
+        img=[]
+        for i in range(len(hex_originImg)):
+            img.append(ImageAnalysis.hex_to_rgb(hex_originImg[i]))
+        img=np.array(img,dtype="uint8").reshape(image.shape)
+        
+        print("K = "+ str(k))
+
 
         #-------------------process the mod_res-----------------------
         mod_res=resultImg.copy()
@@ -255,45 +290,34 @@ def ModifiedKmeans(filename, targetDir, KList, scale):
         #process the imgcounts, reduce the difference by the scale factor
 
         mod_counts=Smoothlist(imgcounts,scale)
+
         #repeat imgcounts
+
         mod_res=np.repeat(mod_res,mod_counts,axis=0)
+
+        #fill up the missing value
         difference=image.shape[0]*image.shape[1]-mod_res.shape[0]*mod_res.shape[1]
         if difference > 0:
             mod_res=np.pad(mod_res,((0,difference),(0,0)),"wrap")
 
-        #------------rebuid image--------------
-
-        
-
-        #PltImg(real_res)
-
-        print("------------------"+ str(i) +"------------------------")
-        print("------------------"+ filename +"------------------------")
-
         #reset the input value
         inputImg=mod_res
 
-
-
-    #result=result.reshape(1,-1,3)
-
-    """
-    plt.figure(figsize = (6, 4))
-    a=np.array([10]*result.shape[0])
-    plt.bar(result,a,color = result)
-    """
-
-    #PltImg(image)
+    
+    filenamewithoutextension=filename.split(".")[0] #删去扩展名
+    print(filename)
+    #save image
+    cv.imwrite(targetDir+"/"+filenamewithoutextension+"_kmeans.png",img)
 
     #plot graph
-    (unique,counts)=ImageAnalysis.ColorDistribution2(mod_res.reshape(1,-1,3))
+    (unique,counts)=ImageAnalysis.ColorDistribution2(img)
 
-    filenamewithoutextension=filename.split(".")[0] #删去扩展名
-
+    
     plt.figure(figsize = (12, 8))
     plt.bar(unique,counts,color = unique)
-    plt.savefig(targetDir+"/"+filenamewithoutextension+".png")
+    plt.savefig(targetDir+"/"+filenamewithoutextension+"_graph.png")
     plt.close()
+
 
 
 def Smoothlist(inputList,scale):
