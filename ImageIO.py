@@ -15,7 +15,7 @@ class ImageIO:
     def ResizeImg(image):
         
         #image = np.asarray(cv2.resize(image,(600,400)))
-        image=gdata.transforms.image.imresize(image, 600, 400)
+        image=gdata.transforms.image.imresize(image, 300, 200)
         return image  
 
     def GetImageFromFileCV(filename):

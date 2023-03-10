@@ -159,7 +159,7 @@ def MuitiKmeansAnalysis(sourceDir,targetDir,K):
     for i in range(len(resultImageList)):
         #ImageIO.PltImg(resultImgs[i])
         #ImageIO.PltImg(resultImgs[i][:,:,::-1])
-        ImageIO.SaveImage(filenames[i],resultImageList[i],"Kmeans",targetDir)
+        ImageIO.SaveImage(filenames[i],resultImageList[i],"",targetDir)
         #np.save(filenames[i].split(".")[0]+".txt",resultImgs[i])
     print("Result images exported in the following directory: "+ targetDir)
 
@@ -179,6 +179,8 @@ def SingleKmeansAnalysis(sourceDir,targetDir,K):
         print("-------------------------" + filename + "-------------------------")
         (res2,ret,label,center) = ColorAnalysis.KmeansSeg(Image,K)
         ImageIO.SaveImage(filename,res2,"Kmeans",targetDir)
+
+
 
 def SegmentationAnalysis(sourceDir,targetDir,labels):
     os.chdir(sourceDir)

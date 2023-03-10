@@ -42,8 +42,6 @@ class Segmentation:
 
     
     def MakeMonoMask(originalImg,predict,labels):
-
-
         
         monoMask=np.copy(predict)
         for i in range(0,monoMask.shape[0]):

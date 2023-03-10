@@ -3,6 +3,7 @@ from tkinter import ttk
 from tkinter import messagebox
 import os
 import main
+from StatisticAnalysis import StatisticAnalysis
 
 root = tk.Tk()
 root.title('Color Analysis ToolKit')
@@ -66,7 +67,7 @@ def seg_button_clicked():
 
     except ValueError as error:
         messagebox.showerror(title='Error', message=error)
-
+#segmentation analysis
     main.SegmentationAnalysis(source,target,labels)
 
 
@@ -101,7 +102,7 @@ scale_Var.set("0.6")
 scale_entry = ttk.Entry(root,width=100,textvariable=scale_Var)
 scale_entry.grid(column=1, row=7, sticky=tk.E, padx=5, pady=5)
 
-#-----------------------Modified Kmeans------------------------------
+#-----------------------Modified Kmeans button------------------------------
 def ModifiedKmeans_button_clicked():
     source = inputDir.get()
     if(os.path.isdir(source)==False):
@@ -130,7 +131,7 @@ ModifiedKmeans_button.grid(column=1, row=8, sticky=tk.E, padx=5, pady=5)
 ModifiedKmeans_button.configure(command=ModifiedKmeans_button_clicked)
 
 
-# ----------------------MuitiKmeansAnalysisFromJson button------------------------
+# ----------------------MuitiKmeansAnalysis button------------------------
 def MuitiKmeans_button_clicked():
     source = inputDir.get()
     if(os.path.isdir(source)==False):
@@ -145,14 +146,33 @@ def MuitiKmeans_button_clicked():
     except ValueError as error:
         messagebox.showerror(title='Error', message=error)
 
-    main.MuitiKmeansAnalysisFromJson(source,target,K)
+    main.MuitiKmeansAnalysis(source,target,K)
 
 
 
-exe_button = ttk.Button(root, text="MuitiKmeansAnalysisFromJson")
+exe_button = ttk.Button(root, text="MuitiKmeansAnalysis")
 exe_button.grid(column=1, row=9, sticky=tk.E, padx=5, pady=5)
 exe_button.configure(command=MuitiKmeans_button_clicked)
 
+# ------------------------------------颜色占比种类分析---------------------------------------
+def BuildColorSourceTable_button_clicked():
+    source = inputDir.get()
+    if(os.path.isdir(source)==False):
+        messagebox.showerror(title='Error', message='invalid input folder path, try again.')
+
+    target = outputDir.get()
+    if(os.path.isdir(target)==False):
+        messagebox.showerror(title='Error', message='invalid output folder path, try again.')
+
+
+
+    StatisticAnalysis.ColorSourceAnalysisFromFile(source,target)
+
+
+
+exe_button = ttk.Button(root, text="BuildColorSourceTable")
+exe_button.grid(column=1, row=10, sticky=tk.E, padx=5, pady=5)
+exe_button.configure(command=BuildColorSourceTable_button_clicked)
 
 
 
