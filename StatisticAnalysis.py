@@ -6,47 +6,49 @@ import pandas as pd
 import os
 
 class StatisticAnalysis:
-    def ColorSourcePair(originImg,segImg):
+    def ColorSourcePair(SourceImg,KmeansResultImg):
+        """
+        SourceImg:original image before segmentation
+        segImg:result image after multi-kmeans process
+        """
 
 
         #进行语义分割，提取分析结果predict
-        predict = Segmentation.Segmentation(originImg)
+        predict = Segmentation.Segmentation(SourceImg)
         predict = predict.flatten().astype(np.uint8)
         
 
         #将Kmeans结果转换为hexcolor
-        segImg=segImg.reshape(-1,3)
-        hex_segImg =[]
-        for color in segImg:
+        KmeansResultImg=KmeansResultImg.reshape(-1,3)
+        hex_KmeansResultImg =[]
+        for color in KmeansResultImg:
                 inputColor=ImageAnalysis.rgb_to_hex(color.flatten())
-                hex_segImg.append(inputColor)
+                hex_KmeansResultImg.append(inputColor)
 
 
         #整合成一张数据表
-        colorDF = pd.DataFrame({"Color":hex_segImg,"label":predict})
+        colorDF = pd.DataFrame({"Color":hex_KmeansResultImg,"label":predict})
         colorDF= colorDF.groupby(["Color","label"])["Color"].count().reset_index(name="Count")
 
         return colorDF
         #存储为json文件
-        
-        print(colorDF)
 
-    def ColorSourceAnalysisFromFile(originImgFolder,segImgFolder):
+    def ColorSourceAnalysisFromFile(sourceImgFolder,KmeansResultImgFolder,targetPath):
 
-        absfilenames=StatisticAnalysis.get_file_path_by_name(originImgFolder)
+        absfilenames=StatisticAnalysis.get_file_path_by_name(sourceImgFolder)
 
         colorDFs = pd.DataFrame()
         for absfilename in absfilenames:
             Image1 = ImageIO.GetImageFromFile(absfilename)
             Image1 = ImageIO.ResizeImg(Image1)
 
-            absfilename2 = segImgFolder+"\\"+os.path.basename(absfilename).split(".")[0]+"_kmeans.png"
+            absfilename2 = KmeansResultImgFolder+"\\"+os.path.basename(absfilename).split(".")[0]+"_kmeans.png"
             Image2 = ImageIO.GetImageFromFileCV(absfilename2)
             Image2 = ImageIO.ResizeImgCV(Image2,(300,200))
             colorDF=StatisticAnalysis.ColorSourcePair(Image1,Image2)
             colorDFs=pd.concat([colorDFs,colorDF])
         colorDFs=colorDFs.groupby(["Color","label"])["Count"].sum().reset_index(name="Count2")
-        colorDFs.to_json(path_or_buf= r"E:\Downloads\BaiduNetdiskDownload\outputColorDF\colorDFs.json")
+        colorDFs.to_json(path_or_buf=targetPath)
 
             
     def get_file_path_by_name(file_dir):
@@ -63,7 +65,7 @@ class StatisticAnalysis:
         return L
 
          
-StatisticAnalysis.ColorSourceAnalysisFromFile(r"E:\Downloads\BaiduNetdiskDownload\testfile",r"E:\Downloads\BaiduNetdiskDownload\outputmultikmeans")
+#StatisticAnalysis.ColorSourceAnalysisFromFile(r"E:\Downloads\BaiduNetdiskDownload\testfile",r"E:\Downloads\BaiduNetdiskDownload\outputmultikmeans",r"E:\Downloads\BaiduNetdiskDownload\outputColorDF\colorDFs.json")
 """
 #test input
 Image = ImageIO.GetImageFromFile(r"E:\Downloads\BaiduNetdiskDownload\testfile\2L7A4756.JPG")
