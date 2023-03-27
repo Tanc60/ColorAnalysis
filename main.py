@@ -9,6 +9,8 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 import cv2 as cv
+from GlobalParameters import GlobalParameters as GP
+
 
 #统计分析图像结果，输出json文件，分析图像包含的颜色种类，和每种颜色出现的频数，每张图片对应一个json文件
 def ResultAnalysis(sourceDir,targetDir):
@@ -98,6 +100,7 @@ def AverageColorCount(colorCounts):
         result=int(color*400*600/sum(colorCounts))
         average.append(result)
     return average
+
 def GenerateList(uniqueColors,averageColorCount):
     resultList=[]
     for i in range(len(uniqueColors)):
@@ -124,7 +127,7 @@ def ResultAnalysis(sourceImage,targetDir):
 
     plt.figure(figsize = (12, 8))
     plt.bar(unique,counts,color = unique)
-    plt.savefig(targetDir+"/resultImg.png")
+    plt.savefig(targetDir+"/resultBar.png")
     plt.close()
 """
 def ResultAnalysis(unique,counts,targetDir):
@@ -140,13 +143,14 @@ def ResultAnalysis(unique,counts,targetDir):
 """
 
 def MuitiKmeansAnalysis(sourceDir,targetDir,K):
+
     os.chdir(sourceDir)
     print(os.getcwd())
     filenames = os.listdir()
     Imgs=[]
     for filename in filenames:
         Image = ImageIO.GetImageFromFileCV(filename)
-        Image = ImageIO.ResizeImgCV(Image,(300,200))
+        Image = ImageIO.ResizeImgCV(Image,(GP.IMGWIDTH,GP.IMGHIGHT))
         Imgs.append(Image)
         print("-------------------------" + filename + "-------------------------")
     print("Calculating Kmeans Result from "+ str(len(Imgs)) + " images-------------------------")
@@ -161,6 +165,10 @@ def MuitiKmeansAnalysis(sourceDir,targetDir,K):
         #ImageIO.PltImg(resultImgs[i][:,:,::-1])
         ImageIO.SaveImage(filenames[i],resultImageList[i],"",targetDir)
         #np.save(filenames[i].split(".")[0]+".txt",resultImgs[i])
+
+    #export result images in a single file
+    ImageIO.SaveImage("rusultImages",resultImages.reshape(GP.IMGHIGHT*len(Imgs),GP.IMGWIDTH,3),"",targetDir)
+
     print("Result images exported in the following directory: "+ targetDir)
 
   
@@ -174,7 +182,7 @@ def SingleKmeansAnalysis(sourceDir,targetDir,K):
 
     for filename in filenames:
         Image = ImageIO.GetImageFromFileCV(filename)
-        Image = ImageIO.ResizeImgCV(Image,(300,200))
+        Image = ImageIO.ResizeImgCV(Image,(GP.IMGWIDTH,GP.IMGHIGHT))
 
         print("-------------------------" + filename + "-------------------------")
         (res2,ret,label,center) = ColorAnalysis.KmeansSeg(Image,K)
@@ -220,7 +228,7 @@ def ModifiedKmeansAnaylsis(SourceDir, targetDir, K, scale):
 #-------------------------------------------------Multi-Iteration Method----------------------------------------------
 def ModifiedKmeans(filename, targetDir, Klist, scale):
     image = ImageIO.GetImageFromFileCV(filename)
-    image = ImageIO.ResizeImgCV(image,(300,200))
+    image = ImageIO.ResizeImgCV(image,(GP.IMGWIDTH,GP.IMGHIGHT))
 
     
     #1st kmeans
