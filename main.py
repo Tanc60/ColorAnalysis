@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import cv2 as cv
 from GlobalParameters import GlobalParameters as GP
+from PIL import Image
 
 
 #统计分析图像结果，输出json文件，分析图像包含的颜色种类，和每种颜色出现的频数，每张图片对应一个json文件
@@ -141,33 +142,44 @@ def ResultAnalysis(unique,counts,targetDir):
     plt.savefig(targetDir+"/resultImg.png")
     plt.close()
 """
+def DirList2FileNameList(dirList):
+    filenames = []
+    for dir in dirList:
+        for root, dirs, files in os.walk(dir):
+            for filename in files:
+                os.chdir(root)
+                filenames.append(os.path.join(os.getcwd(),filename)) 
+    return filenames
 
-def MuitiKmeansAnalysis(sourceDir,targetDir,K):
-
-    os.chdir(sourceDir)
-    print(os.getcwd())
-    filenames = os.listdir()
+def MuitiKmeansAnalysis(sourceList,targetDir,K):
+    filenames = DirList2FileNameList(sourceList)
     Imgs=[]
     for filename in filenames:
-        Image = ImageIO.GetImageFromFileCV(filename)
-        Image = ImageIO.ResizeImgCV(Image,(GP.IMGWIDTH,GP.IMGHIGHT))
-        Imgs.append(Image)
+        image = ImageIO.GetImageFromFileCV(filename)
+        image = ImageIO.ResizeImgCV(image,(GP.IMGWIDTH,GP.IMGHIGHT))
+        Imgs.append(image)
         print("-------------------------" + filename + "-------------------------")
     print("Calculating Kmeans Result from "+ str(len(Imgs)) + " images-------------------------")
     (resultImageList,resultImages) = ColorAnalysis.MuitiKmeans(Imgs,K)
-    #ImageIO.PltImg(bar)
-    
-    ResultAnalysis(resultImages,targetDir)
-    print("JsonFile Exported in the following directory: "+ targetDir)
+
+    #生成柱状图和json
+    #ResultAnalysis(resultImages,targetDir)
+    #print("JsonFile Exported in the following directory: "+ targetDir)
+
+    #save result by individual image
+    savepath=os.path.join(targetDir,"IndividualResult")
+    if(os.path.exists(savepath)==False):
+        os.mkdir(savepath)
 
     for i in range(len(resultImageList)):
-        #ImageIO.PltImg(resultImgs[i])
-        #ImageIO.PltImg(resultImgs[i][:,:,::-1])
-        ImageIO.SaveImage(filenames[i],resultImageList[i],"",targetDir)
-        #np.save(filenames[i].split(".")[0]+".txt",resultImgs[i])
+        baseName = os.path.basename(filenames[i])
+        Image.fromarray(resultImageList[i][:,:,::-1]).save(os.path.join(savepath,baseName))
 
     #export result images in a single file
-    ImageIO.SaveImage("rusultImages",resultImages.reshape(GP.IMGHIGHT*len(Imgs),GP.IMGWIDTH,3),"",targetDir)
+    savepath2=os.path.join(targetDir,"CombinedResult")
+    if(os.path.exists(savepath2)==False):
+        os.mkdir(savepath2)
+    ImageIO.SaveImage("CombinedResult",resultImages.reshape(GP.IMGHIGHT*len(Imgs),GP.IMGWIDTH,3),"",savepath2)
 
     print("Result images exported in the following directory: "+ targetDir)
 
@@ -190,31 +202,43 @@ def SingleKmeansAnalysis(sourceDir,targetDir,K):
 
 
 
-def SegmentationAnalysis(sourceDir,targetDir,labels):
-    os.chdir(sourceDir)
-    print(os.getcwd())
-    filenames = os.listdir()
-    MaskedImgs=[]
+def SegmentationAnalysis(sourceList,targetDir,labels):
+    filenames=DirList2FileNameList(sourceList)
+
     for filename in filenames:
-        Image = ImageIO.GetImageFromFile(filename)
-        Image = ImageIO.ResizeImg(Image)
-        predict = Segmentation.Segmentation(Image)
+        print(filename)
+        image = ImageIO.GetImageFromFile(filename)
+        image = ImageIO.ResizeImg(image)
+        predict = Segmentation.Segmentation(image)
+
+        baseName = os.path.splitext(os.path.basename(filename))[0]
 
         colorMaskedImg = Segmentation.MakeColorMask(predict,filename.split(".")[0]+"color.png")
+
         #save PIL.image
-        baseName=filename.split(".")[0]
-        savePath=os.path.join(targetDir, baseName+"color.png")
+        imgdir=os.path.join(targetDir,"ColorMask")
+        if(os.path.exists(imgdir) == False):
+            os.mkdir(imgdir)
+        savePath=os.path.join(imgdir,baseName+".png")
         colorMaskedImg.save(savePath)
         #ImageIO.SaveImage(filename,colorMaskedImg,"color",targetDir)
-
         #ImageIO.PltImg(colorMaskedImg)
         
-        monoMaskedImg = Segmentation.MakeMonoMask(Image,predict,labels)
-        monoMaskedImg = monoMaskedImg[:,:,::-1]  #bgr to rgb
-        ImageIO.SaveImage(filename,monoMaskedImg," mono",targetDir)
+        monoMaskedImg = Segmentation.MakeMonoMask(image,predict,labels)
+        #monoMaskedImg = monoMaskedImg[:,:,::-1]  #bgr to rgb
+        monoMaskedImg = Image.fromarray(monoMaskedImg)
+
+        imgdir2=os.path.join(targetDir,"MaskedImg")
+        if(os.path.exists(imgdir2) == False):
+            os.mkdir(imgdir2)
+        savePath2=os.path.join(imgdir2,baseName+".png")
+            
+        monoMaskedImg.save(savePath2)
+
+        #ImageIO.SaveImage(filename,monoMaskedImg," mono",targetDir)
         #ImageIO.PltImg(monoMaskedImg)
 
-        MaskedImgs.append(monoMaskedImg)
+        #MaskedImgs.append(monoMaskedImg)
 
 
 def ModifiedKmeansAnaylsis(SourceDir, targetDir, K, scale):

@@ -6,7 +6,7 @@ import main
 from StatisticAnalysis import StatisticAnalysis
 
 root = tk.Tk()
-root.title('Color Analysis ToolKit')
+root.title('Segmentation and Kmeans')
 
 root.option_add( "*font", "Consolas 12" )
 
@@ -41,6 +41,7 @@ outputDir_label.grid(column=0, row=2, sticky=tk.W, padx=5, pady=5)
 outputDir = tk.StringVar()
 outputDir_entry = ttk.Entry(root,width=100,textvariable=outputDir)
 outputDir_entry.grid(column=1, row=2, sticky=tk.W, padx=5, pady=5)
+
 #separator
 separator = ttk.Separator(root, orient='horizontal')
 separator.grid(column=0, row=3, sticky=tk.EW,columnspan=2, padx=5, pady=5)
@@ -54,23 +55,33 @@ lab_Var.set("0 1 2")
 lab_entry = ttk.Entry(root,width=100,textvariable=lab_Var)
 lab_entry.grid(column=1, row=4, sticky=tk.E, padx=5, pady=5)
 
+# input directors string to list
+# Dir 用","分隔
+def DirStr2List(dirStr:str):
+    return list(map(str, dirStr.split(',')))
+    
+
 # Segmentation button
 def seg_button_clicked():
-    source = inputDir.get()
-    if(os.path.isdir(source)==False):
-        messagebox.showerror(title='Error', message='invalid input folder path, try again.')
-
+    # output
     target = outputDir.get()
     if(os.path.isdir(target)==False):
         messagebox.showerror(title='Error', message='invalid output folder path, try again.')
 
+    # label
     try:
         labels = [int(n) for n in lab_Var.get().split()]
-
     except ValueError as error:
         messagebox.showerror(title='Error', message=error)
-#segmentation analysis
-    main.SegmentationAnalysis(source,target,labels)
+
+    #source
+    source = inputDir.get()
+    sourceList = DirStr2List(source)
+    for dir in sourceList:
+        if(os.path.isdir(dir)==False):
+            messagebox.showerror(title='Error', message='invalid input folder path, try again.')
+    #segmentation analysis
+    main.SegmentationAnalysis(sourceList,target,labels)
 
 
 seg_button = ttk.Button(root, text="SegmentationAnalysis")
@@ -135,9 +146,12 @@ ModifiedKmeans_button.configure(command=ModifiedKmeans_button_clicked)
 
 # ----------------------MuitiKmeansAnalysis button------------------------
 def MuitiKmeans_button_clicked():
+
     source = inputDir.get()
-    if(os.path.isdir(source)==False):
-        messagebox.showerror(title='Error', message='invalid input folder path, try again.')
+    sourceList = DirStr2List(source)
+    for dir in sourceList:
+        if(os.path.isdir(dir)==False):
+            messagebox.showerror(title='Error', message='invalid input folder path, try again.')
 
     target = outputDir.get()
     if(os.path.isdir(target)==False):
@@ -148,7 +162,7 @@ def MuitiKmeans_button_clicked():
     except ValueError as error:
         messagebox.showerror(title='Error', message=error)
 
-    main.MuitiKmeansAnalysis(source,target,K)
+    main.MuitiKmeansAnalysis(sourceList,target,K)
 
 
 # description

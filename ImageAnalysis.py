@@ -1,9 +1,11 @@
 import numpy as np
 import cv2 
-
+import os
 from matplotlib import colors
 import matplotlib.pyplot as plt
-
+import colour
+import colorsys
+from GlobalParameters import GlobalParameters as GP
 
 class ImageAnalysis:
     
@@ -22,10 +24,6 @@ class ImageAnalysis:
 
             return (unique,counts)
         
-
-
-
-    @staticmethod
     def rgb_to_hex(rgb_color):
         hex_color = "#"
         for i in rgb_color:
@@ -34,8 +32,6 @@ class ImageAnalysis:
             hex_color += str(hex(num))[-2:].replace("x","0").upper()
         return hex_color
     
-
-    @staticmethod
     def hex_to_rgb(hex):
         hex = hex.lstrip('#')
         r= int(hex[0:2],16)
@@ -43,3 +39,103 @@ class ImageAnalysis:
         b= int(hex[4:6],16)
         rgb = [r,g,b]
         return rgb
+
+    def hexrgb2munsell(hex):
+        rgb=ImageAnalysis.hex_to_rgb(hex)
+
+        unitrgb=[]
+        for element in rgb:
+             unitrgb.append(element/255.0)
+
+        XYZ = colour.sRGB_to_XYZ(unitrgb)
+        xyY = colour.XYZ_to_xyY(XYZ)
+        munsell = colour.xyY_to_munsell_colour(xyY)
+        return munsell
+    
+
+    def HexColorList2HSV(hexcolorlist):
+        HSVList :list[str] = []
+        for hexcolor in hexcolorlist:
+            rgb = ImageAnalysis.hex_to_rgb(hexcolor)
+            (h,s,v) = colorsys.rgb_to_hsv(rgb[0]/255.0, rgb[1]/255.0, rgb[2]/255.0)
+            h
+            hsv : str = "H"+str(int(h*180))+"S"+str(int(s*255))+"V"+str(int(v*255))
+            HSVList.append(hsv)
+        return HSVList
+            
+
+        
+
+
+    
+    def Img2Graph(InputFilename,OutputFilename)->None:
+        '''
+        输入图片，输出颜色分布饼图与柱状图
+        '''
+        image = cv2.imread(InputFilename)
+        #image = cv2.imread(r"E:\Downloads\BaiduNetdiskDownload\resultfile3\2L7A4756 mono.png")
+
+        hexcolorlist,counts=ImageAnalysis.ColorDistribution2(image)
+        percentages = counts / counts.sum() * 100
+
+        HSVList = ImageAnalysis.HexColorList2HSV(hexcolorlist)
+
+        #原图
+        #fig1 = plt.figure(figsize=(5, 5))
+        #plt.savefig()
+        
+        #plt.close()
+
+        #饼图
+        fig2 = plt.figure(figsize=(8, 5))
+        color_labels = [f'{label}:\n{perc:.1f} %' for label, perc in zip(HSVList, percentages)]
+        pie = plt.pie(counts, labels=color_labels, colors=hexcolorlist)
+        plt.savefig(OutputFilename + "_pie.png",bbox_inches='tight',pad_inch=0.5)
+        plt.close()
+
+        #柱状图
+        fig3 = plt.figure(figsize=(8, 5))
+        bars = plt.bar(HSVList, counts,width = GP.BarPlotWidth, color=hexcolorlist)
+        plt.bar_label(bars, [f'{perc:.1f} %' for perc in percentages])
+        
+        plt.xticks(HSVList,
+                rotation=GP.xticksRotation,
+                position = (0,0), #调整年份的位置，让远离了x轴
+                fontsize = GP.fontSize) 
+        plt.savefig(OutputFilename + "_bar.png",bbox_inches='tight',pad_inch=0.5)
+        plt.close()
+
+    def ImageFiles2Graph(filenames,targetDir):
+        for filename in filenames:
+            print(filename)
+            filenamewithoutextension = os.path.basename(filename).split('.')[0] #删去扩展名
+            outPutFilename = targetDir + "\\" + filenamewithoutextension
+            ImageAnalysis.Img2Graph(filename,outPutFilename)
+
+
+    def draw_histogram(sourcefilename,targetfilename):
+
+        img = cv2.imread(sourcefilename)
+        '''
+        b, g, r = img[:,:,0], img[:,:,1], img[:,:,2]
+        hist_b = cv2.calcHist([b],[0],None,[256],[0,256])
+        hist_g = cv2.calcHist([g],[0],None,[256],[0,256])
+        hist_r = cv2.calcHist([r],[0],None,[256],[0,256])
+        plt.plot(hist_r, color='r', label="r")
+        plt.plot(hist_g, color='g', label="g")
+        plt.plot(hist_b, color='b', label="b")
+        plt.legend()
+        plt.savefig(targetfilename)
+        plt.close() 
+        '''
+        img2 = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+        h, s, v = img2[:,:,0], img2[:,:,1], img2[:,:,2]
+        hist_h = cv2.calcHist([h],[0],None,[256],[0,256])
+        hist_s = cv2.calcHist([s],[0],None,[256],[0,256])
+        hist_v = cv2.calcHist([v],[0],None,[256],[0,256])
+        plt.plot(hist_h, color='r', label="h")
+        plt.plot(hist_s, color='g', label="s")
+        plt.plot(hist_v, color='b', label="v")
+        plt.legend()
+        plt.savefig(targetfilename)
+        plt.close() 
