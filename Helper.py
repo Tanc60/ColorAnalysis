@@ -13,3 +13,10 @@ def DirList2FileNameList(dirList):
                 os.chdir(root)
                 filenames.append(os.path.join(os.getcwd(), filename))
     return filenames
+
+
+def AddSuffixToFullFilename(filename, suffix):
+    dirname = os.path.dirname(filename)
+    basename = os.path.basename(filename).split(".")[0]
+    extension = os.path.basename(filename).split(".")[1]
+    return os.path.join(dirname, basename+suffix+"."+extension)

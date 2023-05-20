@@ -90,8 +90,9 @@ def histogram_button_clicked():
     for filename in filenameList:
         basename = os.path.basename(filename)
         targetfilename = os.path.join(target, basename)
-
+        print(filename)
         ImageAnalysis.draw_histogram(filename, targetfilename)
+    print("Result saved in "+target)
 
 
 command_button = ttk.Button(root, text="Histogram")
