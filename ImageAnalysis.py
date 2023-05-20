@@ -1,3 +1,4 @@
+from matplotlib.patches import Patch
 import numpy as np
 import cv2 
 import os
@@ -86,10 +87,18 @@ class ImageAnalysis:
         
         #plt.close()
 
+        #legend
+        legend_elements =[]
+        for i in range(len(HSVList)):
+            legend_elements.append(Patch(facecolor=hexcolorlist[i],label=HSVList[i]))
+
         #饼图
         fig2 = plt.figure(figsize=(8, 5))
-        color_labels = [f'{label}:\n{perc:.1f} %' for label, perc in zip(HSVList, percentages)]
+        color_labels = [f'{perc:.1f} %' for label, perc in zip(HSVList, percentages)]
         pie = plt.pie(counts, labels=color_labels, colors=hexcolorlist)
+
+        plt.legend(handles=legend_elements,bbox_to_anchor=(1.1, 1),loc='upper left')
+
         plt.savefig(OutputFilename + "_pie.png",bbox_inches='tight',pad_inch=0.5)
         plt.close()
 
@@ -102,8 +111,13 @@ class ImageAnalysis:
                 rotation=GP.xticksRotation,
                 position = (0,0), #调整年份的位置，让远离了x轴
                 fontsize = GP.fontSize) 
+        
+        plt.legend(handles=legend_elements,bbox_to_anchor=(1, 1),loc='upper left')
+
         plt.savefig(OutputFilename + "_bar.png",bbox_inches='tight',pad_inch=0.5)
         plt.close()
+
+
 
     def ImageFiles2Graph(filenames,targetDir):
         for filename in filenames:
